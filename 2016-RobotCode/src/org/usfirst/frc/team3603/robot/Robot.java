@@ -20,8 +20,6 @@ public class Robot extends IterativeRobot {
 	Victor left = new Victor(0); // pwm channel 0 for left drive train
 	Victor right = new Victor(1); // pwm channel 1 for right motor drive train
 	RobotDrive maindrive = new RobotDrive(left, right);
-
-	// MANIPULATORS
 	Joystick xbox2 = new Joystick(1);
 	Talon lift = new Talon(2);
 	Talon shooter = new Talon(3);
@@ -87,30 +85,12 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(-1.0, 1.0);
 			}
 			
-			if (xbox.getRawAxis(3) > 0.0) { // turn right at axis command
-				if (all > .2 || all < -.2) { // ||
-					maindrive.tankDrive(-xbox.getRawAxis(2), -xbox.getRawAxis(3));
-				}
-				SmartDashboard.putNumber("left motor value for axis three", left.get());
-				SmartDashboard.putNumber("right motor value for axis three", right.get());
-
-			}
-			if (xbox.getRawAxis(2) > 0.0) { // turn right at axis command
-				maindrive.tankDrive(.5, 0);
-				//if (all > .2 || all < -.2) { // ||
-					//maindrive.tankDrive(-xbox.getRawAxis(3), -xbox.getRawAxis(2));
-				//}
-				SmartDashboard.putNumber("left motor value for axis two", left.get());
-				SmartDashboard.putNumber("right motor value for axis two", right.get());
-
-			}
+	
 			
 			if (xbox.getRawAxis(2) > 0.0) { // turn left at axis command
 				maindrive.tankDrive(0, .5);
 			}
-			if(xbox.getRawAxis(2) > 0.0 || xbox.getRawAxis(3) > 0.0) {
-				maindrive.tankDrive(1.0, 1.0);
-			}
+			
 
 			// XBOX 2 SHOOTER CODE
 
