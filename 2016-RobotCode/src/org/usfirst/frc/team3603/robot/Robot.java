@@ -24,8 +24,12 @@ public class Robot extends IterativeRobot {
 										// 1
 	Talon lift = new Talon(2); // scissor lift screw drive motor
 	Talon shooter = new Talon(3); // shooter wheels
-	Talon winch = new Talon(4); // winch motor
-	Victor arm = new Victor(5); // arm manipulator motor
+	
+	Victor winch = new Victor(4); // winch motor
+	Victor winch2 = new Victor(5); // winch motor
+	
+//	Victor arm = new Victor(5); // arm manipulator motor
+	
 	Compressor single = new Compressor();
 	DoubleSolenoid doublesol2 = new DoubleSolenoid(5,6);
 	DoubleSolenoid doublesol = new DoubleSolenoid(1, 2);
@@ -100,15 +104,31 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			}
+			
+			// FIRST WINCH CIM
 			if (xbox2.getRawButton(8)) { // winch motor UP
-				winch.set(.2);
+				winch.set(.5);
 				SmartDashboard.putNumber("winch value", winch.get());
 			} else if (xbox2.getRawButton(7)) { // winch motor DOWN
-				winch.set(-.2);
+				winch.set(-.5);
 				SmartDashboard.putNumber("winch value", winch.get());
 
 			} else {
 				winch.stopMotor();
+				SmartDashboard.putNumber("winch value", winch.get());
+
+			}
+			
+			// SECOND WINCH CIM
+			if (xbox2.getRawButton(8)) { // winch motor UP
+				winch2.set(.5);
+				SmartDashboard.putNumber("winch value", winch.get());
+			} else if (xbox2.getRawButton(7)) { // winch motor DOWN
+				winch2.set(-.5);
+				SmartDashboard.putNumber("winch value", winch.get());
+
+			} else {
+				winch2.stopMotor();
 				SmartDashboard.putNumber("winch value", winch.get());
 
 			}
@@ -136,18 +156,18 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
 			}
-			if (xbox2.getRawButton(4)) { // arm motor UP
-				arm.set(.5);
-				SmartDashboard.putNumber("arm value", arm.get());
-			} else if (xbox2.getRawButton(3)) { // arm motor DOWN
-				arm.set(-.5);
-				SmartDashboard.putNumber("arm value", arm.get());
-
-			} else {
-				arm.stopMotor();
-				SmartDashboard.putNumber("arm value", arm.get());
-
-			}
+			
+	// ARM IS NO LONGER ATTACHED		
+	//		if (xbox2.getRawButton(4)) { // arm motor UP
+	//			arm.set(.5);
+	//			SmartDashboard.putNumber("arm value", arm.get());
+	//		} else if (xbox2.getRawButton(3)) { // arm motor DOWN
+	//			arm.set(-.5);
+	//			SmartDashboard.putNumber("arm value", arm.get());
+	//		} else {
+	//			arm.stopMotor();
+	//			SmartDashboard.putNumber("arm value", arm.get());
+	//		}
 
 		}
 	}
