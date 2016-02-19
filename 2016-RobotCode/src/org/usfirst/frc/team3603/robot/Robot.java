@@ -16,15 +16,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // 2016 CyberCoyotes Main JAVA Code
 
 public class Robot extends IterativeRobot {
-	Joystick xbox = new Joystick(0);
+	Joystick xbox = new Joystick(0); // XBOX controller for driving - USB 0
 	Victor left = new Victor(0); // pwm channel 0 for left drive train
 	Victor right = new Victor(1); // pwm channel 1 for right motor drive train
 	RobotDrive maindrive = new RobotDrive(left, right);
-	Joystick xbox2 = new Joystick(1);
-	Talon lift = new Talon(2);
-	Talon shooter = new Talon(3);
-	Talon winch = new Talon(4);
-	Victor arm = new Victor(5);
+	Joystick xbox2 = new Joystick(1); // XBOX controller for manipulating - USB 1
+	Talon lift = new Talon(2); // scissor lift screw drive motor
+	Talon shooter = new Talon(3); // shooter wheels
+	Talon winch = new Talon(4); // winch motor
+	Victor arm = new Victor(5); // arm manipulator motor
 	Compressor single = new Compressor();
 	Solenoid singlesol = new Solenoid(0);
 	DoubleSolenoid doublesol = new DoubleSolenoid(1, 2);
@@ -94,24 +94,18 @@ public class Robot extends IterativeRobot {
 
 			// XBOX 2 SHOOTER CODE
 
-			// Lift EXPERIMENTAL CODE
 			if (xbox2.getRawButton(2)) {
-				lift.set(.5);
+				lift.set(.75); // Scissor Lift Motor UP
 				SmartDashboard.putNumber("lift value", lift.get());
-			} else if (xbox2.getRawButton(3)) {
-				lift.set(-1.0);
+			} else if (xbox2.getRawButton(1)) {
+				lift.set(-1.0); // Scissor Lift Motor DOWN
 				SmartDashboard.putNumber("lift value", lift.get());
-
 			} else {
 				lift.stopMotor();
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			}
 
-			/*
-			 * ORIGINAL if (xbox2.getRawButton(2)) { // lift positive value
-			 * lift.set(.5); }
-			 */
 
 			/**
 			 * if (xbox2.getRawAxis(2) > 0) { // shooter negative value
@@ -121,10 +115,10 @@ public class Robot extends IterativeRobot {
 			 * shooter.set(xbox.getRawAxis(3)); }
 			 */
 
-			if (xbox2.getRawButton(8)) { // winch positive value
+			if (xbox2.getRawButton(8)) { // winch motor UP
 				winch.set(.2);
 				SmartDashboard.putNumber("winch value", winch.get());
-			} else if (xbox2.getRawButton(7)) {
+			} else if (xbox2.getRawButton(7)) { // winch motor DOWN
 				winch.set(-.2);
 				SmartDashboard.putNumber("winch value", winch.get());
 
@@ -161,22 +155,20 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
 			}
-			SmartDashboard.putNumber("axis two", xbox2.getRawAxis(2));
-			SmartDashboard.putNumber("axis three", xbox2.getRawAxis(3));
 
 			// if (xbox2.getRawAxis(1) > 0.2) { // axis arm movement
 			// arm.set(xbox2.getRawAxis(1));
 
-			if (xbox2.getRawButton(1)) { // shooter axis movement
+			if (xbox2.getRawButton(4)) { // arm motor UP
 				arm.set(.5);
-				SmartDashboard.putNumber("Shooter value", shooter.get());
-			} else if (xbox2.getRawButton(4)) {
+				SmartDashboard.putNumber("arm value", arm.get());
+			} else if (xbox2.getRawButton(3)) { // arm motor DOWN
 				arm.set(-.5);
-				SmartDashboard.putNumber("Shooter value", shooter.get());
+				SmartDashboard.putNumber("arm value", arm.get());
 
 			} else {
 				arm.stopMotor();
-				SmartDashboard.putNumber("Shooter value", shooter.get());
+				SmartDashboard.putNumber("arm value", arm.get());
 
 			}
 
