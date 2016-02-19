@@ -20,21 +20,20 @@ public class Robot extends IterativeRobot {
 	Victor left = new Victor(0); // pwm channel 0 for left drive train
 	Victor right = new Victor(1); // pwm channel 1 for right motor drive train
 	RobotDrive maindrive = new RobotDrive(left, right);
-	Joystick xbox2 = new Joystick(1); // XBOX controller for manipulating - USB 1
+	Joystick xbox2 = new Joystick(1); // XBOX controller for manipulating - USB
+										// 1
 	Talon lift = new Talon(2); // scissor lift screw drive motor
 	Talon shooter = new Talon(3); // shooter wheels
 	Talon winch = new Talon(4); // winch motor
 	Victor arm = new Victor(5); // arm manipulator motor
 	Compressor single = new Compressor();
-	Solenoid singlesol = new Solenoid(0);
+	DoubleSolenoid doublesol2 = new DoubleSolenoid(5,6);
 	DoubleSolenoid doublesol = new DoubleSolenoid(1, 2);
 	Timer Timer = new Timer();
-	
 
 	public void robotInit() {
 		single.start();
 		Timer.start();
-
 	}
 
 	public void autonomousPeriodic() {
@@ -44,54 +43,50 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		while (isOperatorControl() && isEnabled()) {
 			// XBOX 1 DRIVER CODE
-			
-			SmartDashboard.putNumber("Timer value", Timer.get());
-			
 
-			double xboxmagnitude0 = xbox.getRawAxis(0);
+			SmartDashboard.putNumber("Timer value", Timer.get());
 			double xboxmagnitude1 = xbox.getRawAxis(1);
 			double xboxmagnitude5 = xbox.getRawAxis(5);
 
-			double all = xboxmagnitude0 + xboxmagnitude1 + xboxmagnitude5;
+			double all = xboxmagnitude1 + xboxmagnitude5;
 
 			if (all > .2 || all < -.2) { // ||
 				maindrive.tankDrive(-xbox.getRawAxis(1), -xbox.getRawAxis(5));
 			}
 			SmartDashboard.putNumber("Timer value", Timer.get());
 
+			
 			if (xbox.getRawButton(1)) { // backwards drive
 				maindrive.tankDrive(-.75, -.75);
-
 			}
 			if (xbox.getRawButton(4)) { // forward drive
 				maindrive.tankDrive(.75, .75);
-
 			}
 			if (xbox.getRawButton(2)) { // turn right
 				maindrive.tankDrive(.5, -.5);
-
 			}
-
 			if (xbox.getRawButton(3)) { // turn left
 				maindrive.tankDrive(-.5, .5);
-
 			}
-
 			if (xbox.getRawButton(6)) { // turn right faster
 				maindrive.tankDrive(1.0, -1.0);
 			}
-			
 			if (xbox.getRawButton(5)) { // turn left faster
 				maindrive.tankDrive(-1.0, 1.0);
 			}
-			
-	
-			
 			if (xbox.getRawAxis(2) > 0.0) { // turn left at axis command
-				maindrive.tankDrive(0, .5);
+				maindrive.tankDrive(xbox.getRawAxis(2), 0);
+				if (xbox.getRawAxis(3) > 0.0) {
+					maindrive.tankDrive(1.0, 1.0);
+				}
+			}
+			if (xbox.getRawAxis(3) > 0.0) {
+				maindrive.tankDrive(0, xbox.getRawAxis(3));
+				if (xbox.getRawAxis(2) > 0.0) {
+					maindrive.tankDrive(1.0, 1.0);
+				}
 			}
 			
-
 			// XBOX 2 SHOOTER CODE
 
 			if (xbox2.getRawButton(2)) {
@@ -105,16 +100,6 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			}
-
-
-			/**
-			 * if (xbox2.getRawAxis(2) > 0) { // shooter negative value
-			 * shooter.set(-xbox.getRawAxis(2)); }
-			 * 
-			 * if (xbox2.getRawAxis(3) > 0) { // shooter positive value
-			 * shooter.set(xbox.getRawAxis(3)); }
-			 */
-
 			if (xbox2.getRawButton(8)) { // winch motor UP
 				winch.set(.2);
 				SmartDashboard.putNumber("winch value", winch.get());
@@ -128,21 +113,17 @@ public class Robot extends IterativeRobot {
 
 			}
 
-			/**
-			 * if (xbox2.getRawButton(1)) { // arm positive value arm.set(.75);
-			 * } if (xbox2.getRawButton(4)) { // arm negative arm arm.set(-.75);
-			 * }
-			 */
 			if (xbox2.getRawButton(6)) { // double solenoid forward
 				doublesol.set(DoubleSolenoid.Value.kForward);
 			} else if (xbox2.getRawButton(5)) { // double solenoid reverse
 				doublesol.set(DoubleSolenoid.Value.kReverse);
 			}
-			if (xbox2.getRawButton(10)) {
-				singlesol.set(true);
-			} else if (xbox2.getRawButton(9)) {
-				singlesol.set(false);
+			if (xbox2.getRawButton(9)) { // double solenoid forward
+				doublesol2.set(DoubleSolenoid.Value.kForward);
+			} else if (xbox2.getRawButton(10)) { // double solenoid reverse
+				doublesol2.set(DoubleSolenoid.Value.kReverse);
 			}
+			
 			if (xbox2.getRawAxis(2) > 0.0) {
 				shooter.set(xbox2.getRawAxis(2));
 				SmartDashboard.putNumber("shooter value", shooter.get());
@@ -155,10 +136,6 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
 			}
-
-			// if (xbox2.getRawAxis(1) > 0.2) { // axis arm movement
-			// arm.set(xbox2.getRawAxis(1));
-
 			if (xbox2.getRawButton(4)) { // arm motor UP
 				arm.set(.5);
 				SmartDashboard.putNumber("arm value", arm.get());
