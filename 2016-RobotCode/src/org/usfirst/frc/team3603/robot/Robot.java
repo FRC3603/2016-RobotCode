@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Solenoid;
+// import edu.wpi.first.wpilibj.Servo;
+// import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
@@ -54,8 +54,13 @@ public class Robot extends IterativeRobot {
 		Timer.start();
 	}
 
-	public void autonomousPeriodic() {
+	/* Autonomous Section of Code */
 
+	public void autonomousPeriodic() {
+		
+														// GOAL 1: Drive under low bar with a ball 
+														// GOAL 2: Turn and target high OR low goal
+														// GOAL 3: Shoot ball for a score
 	}
 
 	public void teleopPeriodic() {
@@ -99,12 +104,6 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(-1.0, 1.0);
 			}
 			
-			if (xbox.getRawAxis(2) > 0.0) {				// TRIGGER LEFT Drive left side forward with variable speed at axis command
-				maindrive.tankDrive(xbox.getRawAxis(2), 0);
-				if (xbox.getRawAxis(3) > 0.0) {			
-					maindrive.tankDrive(1.0, 1.0);
-				}
-			}
 			if (xbox.getRawAxis(3) > 0.0) {				// TRIGGER RIGHT Drive right side forward with variable speed at axis command
 				maindrive.tankDrive(0, xbox.getRawAxis(3));
 				if (xbox.getRawAxis(2) > 0.0) {
@@ -112,14 +111,28 @@ public class Robot extends IterativeRobot {
 				}
 			}
 			
+			
+			if (xbox.getRawAxis(2) > 0.0) {				// TRIGGER LEFT Drive left side forward with variable speed at axis command
+				maindrive.tankDrive(xbox.getRawAxis(2), 0);
+				if (xbox.getRawAxis(3) > 0.0) {			
+					maindrive.tankDrive(1.0, 1.0);
+				}
+			}			
+			
 			/* XBOX 2 Manipulator Code*/
-			if (xbox2.getRawButton(2)) {				// B BUTTON Scissor Lift Motor UP
-				lift.set(.75); 
-				SmartDashboard.putNumber("lift value", lift.get());
-				
-			} else if (xbox2.getRawButton(1)) {			// A BUTTON Scissor Lift Motor DOWN
-				lift.set(-1.0); 
-				SmartDashboard.putNumber("lift value", lift.get());
+														// X BUTTON future code for tomahawk?
+			
+														// Y BUTTON future code for tomahawk?
+			
+			
+			 if (xbox2.getRawButton(1)) {				// A BUTTON Scissor Lift Motor DOWN
+					lift.set(-1.0); 
+					SmartDashboard.putNumber("lift value", lift.get());
+			
+			 } else if (xbox2.getRawButton(2)) {		// B BUTTON Scissor Lift Motor UP
+				 lift.set(.75); 
+				 SmartDashboard.putNumber("lift value", lift.get());
+		
 			} else {
 				lift.stopMotor();
 				SmartDashboard.putNumber("lift value", lift.get());
@@ -156,25 +169,25 @@ public class Robot extends IterativeRobot {
 
 			}
 
-			if (xbox2.getRawButton(6)) { 				// double solenoid forward
+			if (xbox2.getRawButton(6)) { 				// RIGHT BUMPER double solenoid forward
 				doublesol.set(DoubleSolenoid.Value.kForward);
 				
-			} else if (xbox2.getRawButton(5)) { 		// double solenoid reverse
+			} else if (xbox2.getRawButton(5)) { 		// LEFT BUMPER double solenoid reverse
 				doublesol.set(DoubleSolenoid.Value.kReverse);
 			}
 			
-			if (xbox2.getRawButton(9)) { 				// double solenoid forward
+			if (xbox2.getRawButton(9)) { 				// THUMBSTICK BUTTON DOWN double solenoid forward
 				doublesol2.set(DoubleSolenoid.Value.kForward);
 				
-			} else if (xbox2.getRawButton(10)) { 		// double solenoid reverse
+			} else if (xbox2.getRawButton(10)) { 		// THUMBSTICK BUTTON DOWN double solenoid reverse
 				doublesol2.set(DoubleSolenoid.Value.kReverse);
 			}
 			
-			if (xbox2.getRawAxis(2) > 0.0) {
+			if (xbox2.getRawAxis(2) > 0.0) {			// RIGHT BUMPER
 				shooter.set(xbox2.getRawAxis(2));
 				SmartDashboard.putNumber("shooter value", shooter.get());
 				
-			} else if (xbox2.getRawAxis(3) > 0.0) {
+			} else if (xbox2.getRawAxis(3) > 0.0) {		// LEFT BUMPER
 				shooter.set(-xbox2.getRawAxis(3));
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
