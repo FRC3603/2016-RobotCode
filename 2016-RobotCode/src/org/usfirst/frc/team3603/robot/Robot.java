@@ -8,6 +8,9 @@
 
 package org.usfirst.frc.team3603.robot;
 
+import com.ni.vision.NIVision;
+
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -19,6 +22,14 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+/* Added for WebCam */
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.DrawMode;
+import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.ShapeMode;
+import edu.wpi.first.wpilibj.CameraServer;
+
 
 public class Robot extends IterativeRobot {
 /* Assigns speed controllers to names and PWN numbers */
@@ -45,15 +56,26 @@ public class Robot extends IterativeRobot {
 
 	Compressor single = new Compressor();
 
-	DoubleSolenoid doublesol2 = new DoubleSolenoid(5,6);
+	DoubleSolenoid doublesol = new DoubleSolenoid(1, 2); // Shooter pneumatics lifter 
 
-	DoubleSolenoid doublesol = new DoubleSolenoid(1, 2);
+	DoubleSolenoid doublesol2 = new DoubleSolenoid(6, 7); // Shooter pneumatic pusher
+
 
 	Timer Timer = new Timer();
-
+	int session; // Added for Camera
+    Image frame; // Added for Camera
+    
 	public void robotInit() {
 		single.start();
 		Timer.start();
+		
+		// USB Webcamera Init Code
+	    frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+
+        // the camera name (ex "cam0") can be found through the roborio web interface
+        session = NIVision.IMAQdxOpenCamera("cam0",
+                NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+        NIVision.IMAQdxConfigureGrab(session);
 	}
 
 
@@ -69,10 +91,10 @@ public class Robot extends IterativeRobot {
 
 	}
 
-	/****************************************
+	/*
 	 *	TELEOP Code
 	 *
-	 ****************************************/
+	*/
 
 	public void teleopPeriodic() {
 		while (isOperatorControl() && isEnabled()) {
@@ -131,9 +153,10 @@ public class Robot extends IterativeRobot {
 			}			
 
 			/* XBOX 2 Manipulator Code*/
-			// X BUTTON future code for tomahawk piston
+			
+														// X BUTTON future code for tomahawk piston
 
-			// Y BUTTON future code for tomahawk piston
+														// Y BUTTON future code for tomahawk piston
 
 
 			if (xbox2.getRawButton(1)) {				// A BUTTON Scissor Lift Motor UP
@@ -151,11 +174,11 @@ public class Robot extends IterativeRobot {
 			}
 
 			/* First winch CIM  */
-			if (xbox2.getRawButton(8)) { 				// START BUTTON check to see! Should be Set to pull the robot up shou
-				winch.set(.5);
+			if (xbox2.getRawButton(8)) { 				// START BUTTON Winch 1 - pull robot up
+				winch.set(1);
 				SmartDashboard.putNumber("winch value", winch.get());
 
-			} else if (xbox2.getRawButton(7)) { 		// BACK BUTTON reverse winch motor, should be needed other than winding rope
+			} else if (xbox2.getRawButton(7)) { 		// BACK BUTTON Winch 1 - let out line
 				winch.set(-.5);
 				SmartDashboard.putNumber("winch value", winch.get());
 
@@ -166,11 +189,11 @@ public class Robot extends IterativeRobot {
 			}
 
 			/* Second Winch CIM  */
-			if (xbox2.getRawButton(8)) { 				// START BUTTON
-				winch2.set(.5);
+			if (xbox2.getRawButton(8)) { 				// START BUTTON Winch 2 - pull robot up
+				winch2.set(1);
 				SmartDashboard.putNumber("winch2 value", winch.get());
 
-			} else if (xbox2.getRawButton(7)) { 		// BACK BUTTON
+			} else if (xbox2.getRawButton(7)) { 		// BACK BUTTON Winch 2 - let out line
 				winch2.set(-.5);
 				SmartDashboard.putNumber("winch2 value", winch.get());
 
@@ -180,20 +203,23 @@ public class Robot extends IterativeRobot {
 
 			}
 
-			if (xbox2.getRawButton(6)) { 				// RIGHT BUMPER double solenoid forward
+			/* Shooter Pneumatics Lifter */ 
+			if (xbox2.getRawButton(6)) { 				// RIGHT BUMPER double solenoid Lift Shooter
 				doublesol.set(DoubleSolenoid.Value.kForward);
 
-			} else if (xbox2.getRawButton(5)) { 		// LEFT BUMPER double solenoid reverse
+			} else if (xbox2.getRawButton(5)) { 		// LEFT BUMPER double solenoid Lower Shooter
 				doublesol.set(DoubleSolenoid.Value.kReverse);
 			}
-
-			if (xbox2.getRawButton(9)) { 				// THUMBSTICK BUTTON DOWN double solenoid forward
+			
+			/* Shooter Pneumatics Pusher */
+			if (xbox2.getRawButton(9)) { 				// THUMBSTICK BUTTON DOWN Ball Pusher Retractor
 				doublesol2.set(DoubleSolenoid.Value.kForward);
 
-			} else if (xbox2.getRawButton(10)) { 		// THUMBSTICK BUTTON DOWN double solenoid reverse
+			} else if (xbox2.getRawButton(10)) { 		// THUMBSTICK BUTTON DOWN Ball Pusher
 				doublesol2.set(DoubleSolenoid.Value.kReverse);
 			}
-
+			
+			/* Shooter Wheels */
 			if (xbox2.getRawAxis(2) > 0.0) {			// RIGHT BUMPER
 				shooter.set(xbox2.getRawAxis(2));
 				SmartDashboard.putNumber("shooter value", shooter.get());
@@ -220,7 +246,32 @@ public class Robot extends IterativeRobot {
 			//			SmartDashboard.putNumber("arm value", arm.get());
 			//		}
 			//
+			
+			// START of CAMERA CODE
+			  NIVision.IMAQdxStartAcquisition(session);
+
+		        /**
+		         * grab an image, draw the circle, and provide it for the camera server
+		         * which will in turn send it to the dashboard.
+		         */
+		        NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+
+		        while (isOperatorControl() && isEnabled()) {
+
+		            NIVision.IMAQdxGrab(session, frame, 1);
+		            NIVision.imaqDrawShapeOnImage(frame, frame, rect,
+		                    DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+		            
+		            CameraServer.getInstance().setImage(frame);
+
+		            /** robot code here! **/
+		            Timer.delay(0.005);		// wait for a motor update time
+		        }
+		        NIVision.IMAQdxStopAcquisition(session);
+			// END of CAMERA CODE
 		}
+		
+		
 	}
 
 	public void testPeriodic() {
