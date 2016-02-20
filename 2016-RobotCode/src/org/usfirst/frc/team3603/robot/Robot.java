@@ -24,11 +24,11 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /* Added for WebCam */
-import com.ni.vision.NIVision;
-import com.ni.vision.NIVision.DrawMode;
-import com.ni.vision.NIVision.Image;
-import com.ni.vision.NIVision.ShapeMode;
-import edu.wpi.first.wpilibj.CameraServer;
+// import com.ni.vision.NIVision;
+// import com.ni.vision.NIVision.DrawMode;
+// import com.ni.vision.NIVision.Image;
+// import com.ni.vision.NIVision.ShapeMode;
+// import edu.wpi.first.wpilibj.CameraServer;
 
 
 public class Robot extends IterativeRobot {
@@ -62,20 +62,20 @@ public class Robot extends IterativeRobot {
 
 
 	Timer Timer = new Timer();
-	int session; // Added for Camera
-    Image frame; // Added for Camera
+	// int session; // Added for Camera
+    // Image frame; // Added for Camera
     
 	public void robotInit() {
 		single.start();
 		Timer.start();
 		
 		// USB Webcamera Init Code
-	    frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+	   // frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 
         // the camera name (ex "cam0") can be found through the roborio web interface
-        session = NIVision.IMAQdxOpenCamera("cam0",
-                NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-        NIVision.IMAQdxConfigureGrab(session);
+        // session = NIVision.IMAQdxOpenCamera("cam0",
+        //        NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+        //NIVision.IMAQdxConfigureGrab(session);
 	}
 
 
@@ -248,26 +248,23 @@ public class Robot extends IterativeRobot {
 			//
 			
 			// START of CAMERA CODE
-			  NIVision.IMAQdxStartAcquisition(session);
+			//  NIVision.IMAQdxStartAcquisition(session);
 
-		        /**
-		         * grab an image, draw the circle, and provide it for the camera server
-		         * which will in turn send it to the dashboard.
-		         */
-		        NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+		      //  /**
+		      //   * grab an image, draw the circle, and provide it for the camera server
+		      //   * which will in turn send it to the dashboard.
+		      //   */
+		      //  NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
 
-		        while (isOperatorControl() && isEnabled()) {
-
-		            NIVision.IMAQdxGrab(session, frame, 1);
-		            NIVision.imaqDrawShapeOnImage(frame, frame, rect,
-		                    DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+		      //      NIVision.IMAQdxGrab(session, frame, 1);
+		      //      NIVision.imaqDrawShapeOnImage(frame, frame, rect,
+		      //              DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
 		            
-		            CameraServer.getInstance().setImage(frame);
+		      //      CameraServer.getInstance().setImage(frame);
 
 		            /** robot code here! **/
-		            Timer.delay(0.005);		// wait for a motor update time
-		        }
-		        NIVision.IMAQdxStopAcquisition(session);
+		      //      Timer.delay(0.005);		// wait for a motor update time
+		      //  NIVision.IMAQdxStopAcquisition(session);
 			// END of CAMERA CODE
 		}
 		
