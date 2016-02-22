@@ -120,15 +120,15 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(.5, -.5);
 			}
 
-			if (xbox.getRawButton(6)) { // BUMPER RIGHT Drive right side
+			//if (xbox.getRawButton(6)) { // BUMPER RIGHT Drive right side
 										// forward, turn left
-				maindrive.tankDrive(1.0, -1.0);
-			}
+				//maindrive.tankDrive(1.0, -1.0);
+			//}
 
-			if (xbox.getRawButton(5)) { // BUMPER LEFT Drive left side forward,
+			//if (xbox.getRawButton(5)) { // BUMPER LEFT Drive left side forward,
 										// turn right
-				maindrive.tankDrive(-1.0, 1.0);
-			}
+				//maindrive.tankDrive(-1.0, 1.0);
+			//}
 
 			if (xbox.getRawAxis(3) > 0.0) { // TRIGGER RIGHT Drive right side
 											// forward with variable speed at
@@ -147,6 +147,13 @@ public class Robot extends IterativeRobot {
 					maindrive.tankDrive(1.0, 1.0);
 				}
 			}
+			if(xbox.getRawButton(7)) {
+				maindrive.tankDrive(-1.0, -1.0);
+			}
+			if(xbox.getRawButton(8)) {
+				maindrive.tankDrive(1.0, 1.0);
+			}
+			
 
 			/* XBOX 2 Manipulator Code */
 
@@ -203,20 +210,20 @@ public class Robot extends IterativeRobot {
 			/* Shooter Pneumatics Pusher */
 			if (xbox2.getRawButton(10)) { // THUMBSTICK BUTTON DOWN Ball Pusher
 											// Retractor
-				doublesol2.set(DoubleSolenoid.Value.kForward);
+				doublesol2.set(DoubleSolenoid.Value.kReverse);
 
 			} else{ // THUMBSTICK BUTTON DOWN Ball
 													// Pusher
-				doublesol2.set(DoubleSolenoid.Value.kReverse);
+				doublesol2.set(DoubleSolenoid.Value.kForward);
 			}
 
 			/* Shooter Wheels */
-			if (xbox2.getRawAxis(2) > 0.0) { // RIGHT BUMPER
+			if (xbox2.getRawAxis(2) > 0.0) { // LEFT TRIGGER
 				double axis2value = xbox2.getRawAxis(2) / 2;
 				shooter.set(axis2value);
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
-			} else if (xbox2.getRawAxis(3) > 0.0) { // LEFT BUMPER
+			} else if (xbox2.getRawAxis(3) > 0.0) { // RIGHT TRIGGER
 				double axis3value = xbox2.getRawAxis(3) / 2;
 				shooter.set(-axis3value);
 				SmartDashboard.putNumber("shooter value", shooter.get());
