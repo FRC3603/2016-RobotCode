@@ -262,13 +262,13 @@ public class Robot extends IterativeRobot {
 			}
 
 			/* Shooter Wheels */
-			if (xbox2.getRawAxis(2) > 0.0) { // LEFT TRIGGER
-				double axis2value = xbox2.getRawAxis(2) / 2;
+			if (xbox2.getRawAxis(2) > 0.0) { // LEFT TRIGGER - pull ball in?
+				double axis2value = xbox2.getRawAxis(2) * .75;
 				shooter.set(axis2value);
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
-			} else if (xbox2.getRawAxis(3) > 0.0) { // RIGHT TRIGGER
-				double axis3value = xbox2.getRawAxis(3) / 2;
+			} else if (xbox2.getRawAxis(3) > 0.0) { // RIGHT TRIGGER - shoot ball out?
+				double axis3value = xbox2.getRawAxis(3);
 				shooter.set(-axis3value);
 				SmartDashboard.putNumber("shooter value", shooter.get());
 
