@@ -10,6 +10,9 @@ package org.usfirst.frc.team3603.robot;
 
 import com.ni.vision.NIVision;
 import com.ni.vision.NIVision.Image;
+
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -55,6 +58,8 @@ public class Robot extends IterativeRobot {
 
 	DoubleSolenoid doublesol2 = new DoubleSolenoid(6, 7); // Shooter pneumatic
 															// pusher
+	AnalogInput ultrasonic = new AnalogInput(0);
+	AnalogGyro gyro = new AnalogGyro(1);
 
 	// CameraServer server;
 	int session;
@@ -80,16 +85,55 @@ public class Robot extends IterativeRobot {
 	// ASSUMPTIONS
 	// Driving under the low bar
 	// Shooting (High or Low?)
-	public void autonomousPeriodic() {
+	public void autonomousInit() {
+		Timer.reset();
 
+		Timer.start();
+
+	}
+
+	public void autonomousPeriodic() {
+		while (isAutonomous() && isEnabled()) {
+			double distanceinches = ultrasonic.getValue() / 9.766;
+			SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+
+			while (Timer.get() < 2.0) {
+				maindrive.tankDrive(.5, .5);
+				SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+
+			}
+			while (Timer.get() < 4.0) {
+				maindrive.tankDrive(.75, .75);
+				SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+
+			}
+			SmartDashboard.putNumber("ultraautonomous value", distanceinches);
+			while (distanceinches > 50.0) {
+				distanceinches = ultrasonic.getValue() / 9.766;
+
+				maindrive.tankDrive(.5, .5);
+				SmartDashboard.putNumber("ultraautonomous value", distanceinches);
+				SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+
+			}
+			while (Timer.get() < 10.0) {
+				doublesol.set(DoubleSolenoid.Value.kReverse);
+				doublesol2.set(DoubleSolenoid.Value.kReverse);
+				shooter.set(1.0);
+			}
+
+			maindrive.tankDrive(0, 0);
+			Timer.stop();
+			SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+		}
 	}
 
 	public void teleopPeriodic() {
 		while (isOperatorControl() && isEnabled()) {
-			//NIVision.IMAQdxStartAcquisition(session);
+			// NIVision.IMAQdxStartAcquisition(session);
 			NIVision.IMAQdxGrab(session, frame, 1);
 			CameraServer.getInstance().setImage(frame);
-			//NIVision.IMAQdxStopAcquisition(session);
+			// NIVision.IMAQdxStopAcquisition(session);
 			/* XBOX 1 DRIVER CODE */
 			SmartDashboard.putNumber("Timer value", Timer.get());
 			double xboxmagnitude1 = xbox.getRawAxis(1);
@@ -120,15 +164,16 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(.5, -.5);
 			}
 
-			//if (xbox.getRawButton(6)) { // BUMPER RIGHT Drive right side
-										// forward, turn left
-				//maindrive.tankDrive(1.0, -1.0);
-			//}
+			// if (xbox.getRawButton(6)) { // BUMPER RIGHT Drive right side
+			// forward, turn left
+			// maindrive.tankDrive(1.0, -1.0);
+			// }
 
-			//if (xbox.getRawButton(5)) { // BUMPER LEFT Drive left side forward,
-										// turn right
-				//maindrive.tankDrive(-1.0, 1.0);
-			//}
+			// if (xbox.getRawButton(5)) { // BUMPER LEFT Drive left side
+			// forward,
+			// turn right
+			// maindrive.tankDrive(-1.0, 1.0);
+			// }
 
 			if (xbox.getRawAxis(3) > 0.0) { // TRIGGER RIGHT Drive right side
 											// forward with variable speed at
@@ -147,13 +192,12 @@ public class Robot extends IterativeRobot {
 					maindrive.tankDrive(1.0, 1.0);
 				}
 			}
-			if(xbox.getRawButton(7)) {
+			if (xbox.getRawButton(7)) {
 				maindrive.tankDrive(-1.0, -1.0);
 			}
-			if(xbox.getRawButton(8)) {
+			if (xbox.getRawButton(8)) {
 				maindrive.tankDrive(1.0, 1.0);
 			}
-			
 
 			/* XBOX 2 Manipulator Code */
 
@@ -212,8 +256,8 @@ public class Robot extends IterativeRobot {
 											// Retractor
 				doublesol2.set(DoubleSolenoid.Value.kReverse);
 
-			} else{ // THUMBSTICK BUTTON DOWN Ball
-													// Pusher
+			} else { // THUMBSTICK BUTTON DOWN Ball
+						// Pusher
 				doublesol2.set(DoubleSolenoid.Value.kForward);
 			}
 
