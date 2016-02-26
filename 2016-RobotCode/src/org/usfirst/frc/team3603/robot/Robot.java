@@ -93,7 +93,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousPeriodic() {
-		while (isAutonomous() && isEnabled()) {
+		while (isAutonomous() && isEnabled()) {    // complete trial version- not to be used in competition
 			double distanceinches = ultrasonic.getValue() / 9.766;
 			SmartDashboard.putNumber("Timer during autonomous", Timer.get());
 
@@ -154,13 +154,11 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(-.5, -.5);
 			}
 
-			if (xbox.getRawButton(1)) { // A BUTTON Spin slow left DO WE NEED
-										// THIS?
+			if (xbox.getRawButton(1)) { // A BUTTON Spin slow left 
 				maindrive.tankDrive(-.5, .5);
 			}
 
-			if (xbox.getRawButton(2)) { // B BUTTON Spin slow right DO WE NEED
-										// THIS?
+			if (xbox.getRawButton(2)) { // B BUTTON Spin slow right 
 				maindrive.tankDrive(.5, -.5);
 			}
 
@@ -192,10 +190,10 @@ public class Robot extends IterativeRobot {
 					maindrive.tankDrive(1.0, 1.0);
 				}
 			}
-			if (xbox.getRawButton(7)) {
+			if (xbox.getRawButton(7)) {   //button 7 drive backwards at full speed
 				maindrive.tankDrive(-1.0, -1.0);
 			}
-			if (xbox.getRawButton(8)) {
+			if (xbox.getRawButton(8)) {    //button 8 drive forward at full speed
 				maindrive.tankDrive(1.0, 1.0);
 			}
 
