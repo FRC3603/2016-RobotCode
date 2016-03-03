@@ -83,6 +83,8 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousPeriodic() {
+/*** COMMENTING OUT TO TEST CODE DEPLOYMENT - SHOULDNT IMPACT, BUT READ ONLINE TO CHECK FOR POTENTIAL LOOPS
+ * 
 		while (isAutonomous()) {
 			maindrive.setSafetyEnabled(false);
 
@@ -124,7 +126,7 @@ public class Robot extends IterativeRobot {
 			}
 
 		}
-		
+*/		
 	}
 
 	public void teleopPeriodic() {
