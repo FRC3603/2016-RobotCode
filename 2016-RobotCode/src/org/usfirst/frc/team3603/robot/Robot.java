@@ -37,8 +37,8 @@ public class Robot extends IterativeRobot {
 
 	RobotDrive maindrive = new RobotDrive(left, right);
 
-	Joystick xbox2 = new Joystick(1); // XBOX controller for manipulating - USB
-										// 1
+	Joystick xbox2 = new Joystick(5); // XBOX controller for manipulating - USB
+										// 5
 
 	Talon lift = new Talon(2); // scissor lift screw drive motor
 
@@ -58,13 +58,13 @@ public class Robot extends IterativeRobot {
 
 	DoubleSolenoid doublesol2 = new DoubleSolenoid(6, 7); // Shooter pneumatic
 															// pusher
-	AnalogInput ultrasonic = new AnalogInput(0);
-	AnalogGyro gyro = new AnalogGyro(1);
+	DoubleSolenoid doublesol3 = new DoubleSolenoid(4, 5);
+	 AnalogInput ultrasonic = new AnalogInput(0);
+	 AnalogGyro gyro = new AnalogGyro(1);
 
 	// CameraServer server;
 	int session;
 	Image frame;
-
 	Timer Timer = new Timer();
 
 	public void robotInit() {
@@ -93,43 +93,54 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void autonomousPeriodic() {
-		while (isAutonomous() && isEnabled()) {    // complete trial version- not to be used in competition
+		while (isAutonomous()) {
+			maindrive.setSafetyEnabled(false);
+
+			double gyroangle = gyro.getAngle();
 			double distanceinches = ultrasonic.getValue() / 9.766;
-			SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+			SmartDashboard.putNumber("Timer during auton", Timer.get());
 
-			while (Timer.get() < 2.0) {
+			SmartDashboard.putNumber("Gyro in auton", gyroangle);
+			SmartDashboard.putString("Shooter ON/OFF", "OFF");
+			while (Timer.get() < 6.0) {
 				maindrive.tankDrive(.5, .5);
-				SmartDashboard.putNumber("Timer during autonomous", Timer.get());
-
-			}
-			while (Timer.get() < 4.0) {
-				maindrive.tankDrive(.75, .75);
-				SmartDashboard.putNumber("Timer during autonomous", Timer.get());
-
-			}
-			SmartDashboard.putNumber("ultraautonomous value", distanceinches);
-			while (distanceinches > 50.0) {
-				distanceinches = ultrasonic.getValue() / 9.766;
-
-				maindrive.tankDrive(.5, .5);
-				SmartDashboard.putNumber("ultraautonomous value", distanceinches);
-				SmartDashboard.putNumber("Timer during autonomous", Timer.get());
+				SmartDashboard.putNumber("Timer during auton", Timer.get());
 
 			}
 			while (Timer.get() < 10.0) {
-				doublesol.set(DoubleSolenoid.Value.kReverse);
+				maindrive.tankDrive(.75, .75);
+				SmartDashboard.putNumber("Timer during auton", Timer.get());
+
+			}
+			while (distanceinches > 50) {
+				maindrive.tankDrive(.5, .5);
+				distanceinches = ultrasonic.getValue() / 9.766;
+				SmartDashboard.putNumber("distanceinches in auton", distanceinches);
+
+			}
+			SmartDashboard.putNumber("gyro before loop", gyro.getAngle());
+			while (gyroangle < 40) {
+				gyroangle = gyro.getAngle();
+				maindrive.tankDrive(.5, -.5);
+				SmartDashboard.putNumber("Gyro in auton", gyroangle);
+
+			}
+			while (Timer.get() < 8.0) {
+				doublesol.set(DoubleSolenoid.Value.kForward);
 				doublesol2.set(DoubleSolenoid.Value.kReverse);
+			}
+			while (Timer.get() < 10.0) {
 				shooter.set(1.0);
 			}
 
-			maindrive.tankDrive(0, 0);
-			Timer.stop();
-			SmartDashboard.putNumber("Timer during autonomous", Timer.get());
 		}
 	}
 
 	public void teleopPeriodic() {
 		while (isOperatorControl() && isEnabled()) {
+			double distanceinches = ultrasonic.getValue() / 9.766;
+			SmartDashboard.putNumber("distance in inches", distanceinches);
+
 			// NIVision.IMAQdxStartAcquisition(session);
 			NIVision.IMAQdxGrab(session, frame, 1);
 			CameraServer.getInstance().setImage(frame);
@@ -154,12 +165,22 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(-.5, -.5);
 			}
 
-			if (xbox.getRawButton(1)) { // A BUTTON Spin slow left 
+			if (xbox.getRawButton(1)) { // A BUTTON Spin slow left
 				maindrive.tankDrive(-.5, .5);
 			}
 
-			if (xbox.getRawButton(2)) { // B BUTTON Spin slow right 
+			if (xbox.getRawButton(2)) { // B BUTTON Spin slow right
 				maindrive.tankDrive(.5, -.5);
+			}
+			
+			/* Shooter Wheels */ // NEW COMMENT- THIS WAS ADDED TO THE DRIVER
+									// CONTROLLER
+			if (xbox.getRawButton(5)) {
+				shooter.set(.75);
+			} else if (xbox.getRawButton(6)) {
+				shooter.set(-1.0);
+			} else {
+				shooter.stopMotor();
 			}
 
 			// if (xbox.getRawButton(6)) { // BUMPER RIGHT Drive right side
@@ -190,10 +211,11 @@ public class Robot extends IterativeRobot {
 					maindrive.tankDrive(1.0, 1.0);
 				}
 			}
-			if (xbox.getRawButton(7)) {   //button 7 drive backwards at full speed
+			if (xbox.getRawButton(7)) { // BACK BUTTON 7 Drive backwards at full
+										// speed
 				maindrive.tankDrive(-1.0, -1.0);
 			}
-			if (xbox.getRawButton(8)) {    //button 8 drive forward at full speed
+			if (xbox.getRawButton(8)) { // START BUTTON 8 Drive forward at full speed
 				maindrive.tankDrive(1.0, 1.0);
 			}
 
@@ -203,13 +225,12 @@ public class Robot extends IterativeRobot {
 
 			// Y BUTTON future code for tomahawk piston
 
-			if (xbox2.getRawButton(1)) { // A BUTTON Scissor Lift Motor UP
-				lift.set(.5);
+			if (xbox2.getRawButton(1)) { 		// A BUTTON Scissor Lift Motor
+				lift.set(-.75);					// DOWN
 				SmartDashboard.putNumber("lift value", lift.get());
 
-			} else if (xbox2.getRawButton(2)) { // B BUTTON Scissor Lift Motor
-												// DOWN
-				lift.set(-.75);
+			} else if (xbox2.getRawButton(2)) {	// B BUTTON Scissor Lift Motor
+				lift.set(.5);					// UP
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			} else {
@@ -218,17 +239,16 @@ public class Robot extends IterativeRobot {
 
 			}
 
-			if (xbox2.getRawButton(8)) { // START BUTTON Winch 1 - pull robot up
-				winch.set(1.0);
+			if (xbox2.getRawButton(8)) { 		// START BUTTON Winch
+				winch.set(1.0);					// CIM 1 Pull Robot Up
 				SmartDashboard.putNumber("winch value", winch.get());
-				winch2.set(1.0);
+				winch2.set(1.0);				// CIM 2 Pull Robot Up - ALWAYS KEEP SAME AS CIM 1 for Button
 				SmartDashboard.putNumber("winch2 value", winch.get());
 
-			} else if (xbox2.getRawButton(7)) { // BACK BUTTON Winch 1 - let out
-												// line
-				winch.set(-1.0);
+			} else if (xbox2.getRawButton(7)) { // BACK BUTTON Winch
+				winch.set(-1.0);				// CIM 1 Let out line
 				SmartDashboard.putNumber("winch value", winch.get());
-				winch2.set(-1.0);
+				winch2.set(-1.0);				// CIM 2 Let out line - ALWAYS KEEP SAME as CIM 1 for Button
 				SmartDashboard.putNumber("winch2 value", winch.get());
 
 			} else {
@@ -259,21 +279,16 @@ public class Robot extends IterativeRobot {
 				doublesol2.set(DoubleSolenoid.Value.kForward);
 			}
 
-			/* Shooter Wheels */
-			if (xbox2.getRawAxis(2) > 0.0) { // LEFT TRIGGER - pull ball in?
-				double axis2value = xbox2.getRawAxis(2) * .75;
-				shooter.set(axis2value);
-				SmartDashboard.putNumber("shooter value", shooter.get());
+			/* Arm DoubleSolenoid */
 
-			} else if (xbox2.getRawAxis(3) > 0.0) { // RIGHT TRIGGER - shoot ball out?
-				double axis3value = xbox2.getRawAxis(3);
-				shooter.set(-axis3value);
-				SmartDashboard.putNumber("shooter value", shooter.get());
+			if (xbox2.getRawButton(4)) { 		// should raise arm - NEEDS
+												// VERIFICATION
 
-			} else {
-				shooter.stopMotor();
-				SmartDashboard.putNumber("shooter value", shooter.get());
+				doublesol3.set(DoubleSolenoid.Value.kForward);
+			} else if (xbox2.getRawButton(3)) { // should lower arm - NEEDS
+												// VERIFICATION
 
+				doublesol3.set(DoubleSolenoid.Value.kReverse);
 			}
 
 			// CURRENTLY ARM NO LONGER ATTACHED 2016-02-16
