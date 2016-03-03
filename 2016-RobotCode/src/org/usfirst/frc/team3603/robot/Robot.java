@@ -48,9 +48,6 @@ public class Robot extends IterativeRobot {
 
 	Victor winch2 = new Victor(5); // CIM winch 2 motor
 
-	// Victor arm = new Victor(5); // Arm manipulator motor - REPLACED WITH CIM
-	// 2016-02-19
-
 	Compressor single = new Compressor();
 
 	DoubleSolenoid doublesol = new DoubleSolenoid(1, 2); // Shooter pneumatics
@@ -77,14 +74,7 @@ public class Robot extends IterativeRobot {
 
 	}
 
-	/* AUTONONMOUS Code */
-	// GOAL 1: Drive under low bar with a ball
-	// GOAL 2: Turn and target goal
-	// GOAL 3: Shoot ball for a score
-	//
-	// ASSUMPTIONS
-	// Driving under the low bar
-	// Shooting (High or Low?)
+
 	public void autonomousInit() {
 		Timer.reset();
 
@@ -134,6 +124,7 @@ public class Robot extends IterativeRobot {
 			}
 
 		}
+		
 	}
 
 	public void teleopPeriodic() {
@@ -151,55 +142,63 @@ public class Robot extends IterativeRobot {
 			double xboxmagnitude5 = xbox.getRawAxis(5);
 
 			double all = xboxmagnitude1 + xboxmagnitude5;
+			
+			
+			
+			/****************************************
+			* BLACK XBOX CONTROLLER
+			* DRIVER + SHOOT BALL
+			***************************************/
 
-			if (all > .2 || all < -.2) { // || what does this code do?
+			if (all > .2 || all < -.2) { // || 
 				maindrive.tankDrive(-xbox.getRawAxis(1), -xbox.getRawAxis(5));
 			}
 			SmartDashboard.putNumber("Timer value", Timer.get());
 
-			if (xbox.getRawButton(3)) { // X BUTTON Drive Forward
-				maindrive.tankDrive(.5, .5);
+
+			if (xbox.getRawButton(1)) { 		// A BUTTON
+				maindrive.tankDrive(-.5, .5);	// Spin left slow
 			}
 
-			if (xbox.getRawButton(4)) { // Y BUTTON Drive backward
-				maindrive.tankDrive(-.5, -.5);
+			if (xbox.getRawButton(2)) { 		// B BUTTON
+				maindrive.tankDrive(.5, -.5);	// Spin right slow
+			}
+			if (xbox.getRawButton(3)) { 		// X BUTTON
+				maindrive.tankDrive(.5, .5);	// Drive Forward Slow
 			}
 
-			if (xbox.getRawButton(1)) { // A BUTTON Spin slow left
-				maindrive.tankDrive(-.5, .5);
+			if (xbox.getRawButton(4)) { 		// Y BUTTON
+				maindrive.tankDrive(-.5, -.5);	// Drive Backward Slow
 			}
 
-			if (xbox.getRawButton(2)) { // B BUTTON Spin slow right
-				maindrive.tankDrive(.5, -.5);
-			}
+			/*** 
+			 * MOVED BACK TO SECONDARY USB (Axis 2 and Axis 3) BUT NEEDS CONFIRMATION
+			 */
+//			if (xbox.getRawButton(5)) {			// LEFT BUMPER
+//				shooter.set(.75);				// ball wheel spin in 
+//			} else if (xbox.getRawButton(6)) {	// RIGHT Bumper
+//				shooter.set(-1.0);				// ball wheel spin out - requires pneumatic to fire ball
+//			} else {
+//				shooter.stopMotor();
+//			}
 			
-			/* Shooter Wheels */ // NEW COMMENT- THIS WAS ADDED TO THE DRIVER
-									// CONTROLLER
-			if (xbox.getRawButton(5)) {
-				shooter.set(.75);
-			} else if (xbox.getRawButton(6)) {
-				shooter.set(-1.0);
+			/* Shooter Pneumatics Pusher */
+			if (xbox.getRawButton(6)) { 						// RIGHT BUMPER
+				doublesol2.set(DoubleSolenoid.Value.kReverse);	// Push Ball into shooter wheels
+																// Pneumatic should retract on its own
+
 			} else {
-				shooter.stopMotor();
+				doublesol2.set(DoubleSolenoid.Value.kForward);
 			}
 
-			// if (xbox.getRawButton(6)) { // BUMPER RIGHT Drive right side
-			// forward, turn left
-			// maindrive.tankDrive(1.0, -1.0);
-			// }
 
-			// if (xbox.getRawButton(5)) { // BUMPER LEFT Drive left side
-			// forward,
-			// turn right
-			// maindrive.tankDrive(-1.0, 1.0);
-			// }
-
-			if (xbox.getRawAxis(3) > 0.0) { // TRIGGER RIGHT Drive right side
-											// forward with variable speed at
-											// axis command
-				maindrive.tankDrive(0, xbox.getRawAxis(3));
-				if (xbox.getRawAxis(2) > 0.0) {
-					maindrive.tankDrive(1.0, 1.0);
+			if (xbox.getRawAxis(3) > 0.0) { 	// TRIGGER RIGHT
+												// Drive right side forward with variable speed at
+												// axis command
+				maindrive.tankDrive(0, xbox.getRawAxis(3));		
+				if (xbox.getRawAxis(2) > 0.0) {		
+												
+				maindrive.tankDrive(1.0, 1.0);
 				}
 			}
 
@@ -219,18 +218,18 @@ public class Robot extends IterativeRobot {
 				maindrive.tankDrive(1.0, 1.0);
 			}
 
-			/* XBOX 2 Manipulator Code */
+		
+			/****************************************
+			* AFTERGLOW XBOX CONTROLLER
+			* MANIPULATOR
+			***************************************/
 
-			// X BUTTON future code for tomahawk piston
-
-			// Y BUTTON future code for tomahawk piston
-
-			if (xbox2.getRawButton(1)) { 		// A BUTTON Scissor Lift Motor
-				lift.set(-.75);					// DOWN
+			if (xbox2.getRawButton(1)) { 		// A BUTTON 
+				lift.set(-.75);					// Scissor Lift Motor DOWN
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			} else if (xbox2.getRawButton(2)) {	// B BUTTON Scissor Lift Motor
-				lift.set(.5);					// UP
+				lift.set(.5);					// Scissor Lift Motor UP
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			} else {
@@ -238,17 +237,24 @@ public class Robot extends IterativeRobot {
 				SmartDashboard.putNumber("lift value", lift.get());
 
 			}
+			
+			/* Arm DoubleSolenoid */
+			if (xbox2.getRawButton(4)) { 						// X BUTTON 
+				doublesol3.set(DoubleSolenoid.Value.kForward); 	// should raise arm - NEEDS VERIFICATION
+				} else if (xbox2.getRawButton(3)) { 			// Y BUTTON
+				doublesol3.set(DoubleSolenoid.Value.kReverse);	// should lower arm - NEEDS VERIFICATION
+				}
 
 			if (xbox2.getRawButton(8)) { 		// START BUTTON Winch
 				winch.set(1.0);					// CIM 1 Pull Robot Up
 				SmartDashboard.putNumber("winch value", winch.get());
-				winch2.set(1.0);				// CIM 2 Pull Robot Up - ALWAYS KEEP SAME AS CIM 1 for Button
+				winch2.set(1.0);				// CIM 2 Pull Robot Up - ALWAYS KEEP SAME VALUE AS CIM 1 for Button
 				SmartDashboard.putNumber("winch2 value", winch.get());
 
 			} else if (xbox2.getRawButton(7)) { // BACK BUTTON Winch
 				winch.set(-1.0);				// CIM 1 Let out line
 				SmartDashboard.putNumber("winch value", winch.get());
-				winch2.set(-1.0);				// CIM 2 Let out line - ALWAYS KEEP SAME as CIM 1 for Button
+				winch2.set(-1.0);				// CIM 2 Let out line - ALWAYS KEEP SAME VALUE as CIM 1 for Button
 				SmartDashboard.putNumber("winch2 value", winch.get());
 
 			} else {
@@ -269,42 +275,37 @@ public class Robot extends IterativeRobot {
 				doublesol.set(DoubleSolenoid.Value.kReverse);
 			}
 
-			/* Shooter Pneumatics Pusher */
-			if (xbox2.getRawButton(10)) { // THUMBSTICK BUTTON DOWN Ball Pusher
-											// Retractor
-				doublesol2.set(DoubleSolenoid.Value.kReverse);
+			
+			// NEED TO CHANGE TO BOOLEAN
+//			if (xbox2.getRawAxis(2)) {
+//				shooter.set(.75);
+				
+//			} else if (xbox2.getRawAxis(3)) {
+//				shooter.set(-1.0);
+//			} else {
+//				shooter.stopMotor();
+//			}
 
-			} else { // THUMBSTICK BUTTON DOWN Ball
-						// Pusher
-				doublesol2.set(DoubleSolenoid.Value.kForward);
-			}
+			
+			/********
+			* CODE BELOW SHOULD BE SAFE TO DELETE
+			*/
+//			/* Shooter Pneumatics Pusher */ MOVED to USB 1 DRIVER BUTTON 6
+//			if (xbox2.getRawButton(10)) { // THUMBSTICK BUTTON DOWN Ball Pusher
+//											// Retractor
+//				doublesol2.set(DoubleSolenoid.Value.kReverse);
+//
+//			} else { // THUMBSTICK BUTTON DOWN Ball
+//						// Pusher
+//				doublesol2.set(DoubleSolenoid.Value.kForward);
+//			}
 
-			/* Arm DoubleSolenoid */
+			
 
-			if (xbox2.getRawButton(4)) { 		// should raise arm - NEEDS
-												// VERIFICATION
+	
 
-				doublesol3.set(DoubleSolenoid.Value.kForward);
-			} else if (xbox2.getRawButton(3)) { // should lower arm - NEEDS
-												// VERIFICATION
-
-				doublesol3.set(DoubleSolenoid.Value.kReverse);
-			}
-
-			// CURRENTLY ARM NO LONGER ATTACHED 2016-02-16
-			// if (xbox2.getRawButton(4)) { // Y BUTTON arm motor UP
-			// arm.set(.5);
-			// SmartDashboard.putNumber("arm value", arm.get());
-			// } else if (xbox2.getRawButton(3)) { // X BUTTON arm motor DOWN
-			// arm.set(-.5);
-			// SmartDashboard.putNumber("arm value", arm.get());
-			// } else {
-			// arm.stopMotor();
-			// SmartDashboard.putNumber("arm value", arm.get());
-			// }
-			//
-
-			edu.wpi.first.wpilibj.Timer.delay(0.005);
+			
+			edu.wpi.first.wpilibj.Timer.delay(0.005); // WHAT DOES THIS CODE DO? 
 
 		}
 
